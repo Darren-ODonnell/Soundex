@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Soundexer {
 
-    public  String encode(String value) {
+    public String encode(String value) {
         String code = encodeString(value);
         code = removeDuplicates(code);
         code = fillOutToFour(code);
@@ -29,14 +29,13 @@ public class Soundexer {
     }
 
     public  String encodeString(String value) {
+        value = value.toLowerCase();
         StringBuilder encoded = new StringBuilder();
         char[] chars = value.toCharArray();
-        encoded.append(chars[0]);
+        // get first char - change to uppercase, and make this first char in encoded string.
+        encoded.append(Character.toUpperCase(chars[0]));
 
-        // add first char to head of list
-//       int i=0;
-//        encoded += (!"aeiou".contains("" + chars[i]) ) ? chars[i]: chars[++i];
-//
+
         for (int i = 1 ; i < chars.length;i++) {
             switch(chars[i]) {
                 case 'a':
