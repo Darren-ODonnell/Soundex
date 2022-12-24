@@ -1,7 +1,5 @@
 package org.example;
 
-import jdk.jfr.Description;
-import jdk.jfr.Name;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.language.RefinedSoundex;
 import org.apache.commons.codec.language.Soundex;
@@ -10,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -43,6 +39,8 @@ public class Main {
     final static int APACHE_ENCODER = 1;
     final static int OWN_ENCODER = 2;
     final static int REFINED_ENCODER = 3;
+    final static int DIFFERENCES = 4;
+
 
     public static void main(String[] args) {
         System.out.println("Hello world!");
@@ -67,6 +65,11 @@ public class Main {
     private static void singleWordDiffChecks() {
         // using 'first' words and playerNumberSoundexes
 
+
+
+
+
+
         for(String word : first) {
             String wordDex = dex.encode(word);
             String wordDexer = dexer.encode(word);
@@ -79,6 +82,8 @@ public class Main {
                 int rating = difference(wordDexer,wordToMatchDexer );
 
                 try {
+                    // create array of output parameters
+                    // then using string.join to add a separator between each
                     String[] array = new String[]{
                             word,
                             "Dex "+wordToMatch+"->"+wordDex+"->"+wordToMatchDex,
@@ -158,6 +163,15 @@ public class Main {
                  f += countSuccess(rDex, firsttwowords, successSoundexes);
                  f += countSuccess(rDex, third, onePLusTwoSoundexes);
                  break;
+             case DIFFERENCES :
+                 f  = countSuccess(dexer, first, playerNumberSoundexes, DIFFERENCES);
+                 f += countSuccess(dexer, second, statNameSoundexes, DIFFERENCES);
+                 f += countSuccess(dexer, third, successSoundexes, DIFFERENCES);
+                 f += countSuccess(dexer, firsttwowords, successSoundexes, DIFFERENCES);
+                 f += countSuccess(dexer, third, onePLusTwoSoundexes, DIFFERENCES);
+                 break;
+
+
          }
         return f;
     }
@@ -186,6 +200,29 @@ public class Main {
         System.out.println();
         return f;
     }
+    private static int countSuccess(Soundexer dex, List<String> list, HashMap<String, String> soundexes, int type) {
+        int f = 0;
+        for(String word : list) {
+            int found = findByDifferences(dex, word, soundexes);
+             f+=found;
+        };
+        System.out.println();
+        return f;
+    }
+
+    private static int findByDifferences(Soundexer dex, String word, HashMap<String, String> soundexes) {
+
+        HashMap<String, Integer> ratings = new HashMap<>();
+        String wordex = dex.encode(word);
+        for(String soundexKey : soundexes.keySet()) {
+            ratings.put(soundexKey, difference(wordex, soundexKey));
+        }
+
+
+
+    }
+
+
     private static int countSuccess(RefinedSoundex dex, List<String> list, HashMap<String, String> soundexes) {
         int f = 0;
         for(String word : list) {
