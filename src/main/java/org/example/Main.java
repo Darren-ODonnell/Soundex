@@ -142,21 +142,21 @@ public class Main {
                  f += countSuccess(dex, second, statNameSoundexes);
                  f += countSuccess(dex, third, successSoundexes);
                  f += countSuccess(dex, firsttwowords, onePLusTwoSoundexes);
-//                 f += countSuccess(dex, third, onePLusTwoSoundexes);
+                 f += countSuccess(dex, secondtwowords, twoPlusThreeSoundexes);
                  break;
              case OWN_ENCODER:
                  f  = countSuccess(dexer, first, playerNumberSoundexes);
                  f += countSuccess(dexer, second, statNameSoundexes);
                  f += countSuccess(dexer, third, successSoundexes);
                  f += countSuccess(dexer, firsttwowords, onePLusTwoSoundexes);
-//                 f += countSuccess(dexer, third, onePLusTwoSoundexes);
+                 f += countSuccess(dexer, secondtwowords, twoPlusThreeSoundexes);
                  break;
              case REFINED_ENCODER:
                  f  = countSuccess(rDex, first, playerNumberSoundexes);
                  f += countSuccess(rDex, second, statNameSoundexes);
                  f += countSuccess(rDex, third, successSoundexes);
                  f += countSuccess(rDex, firsttwowords, onePLusTwoSoundexes);
-//                 f += countSuccess(rDex, third, onePLusTwoSoundexes);
+                 f += countSuccess(rDex, secondtwowords, twoPlusThreeSoundexes);
                  break;
              case DIFFERENCES :
                  f  = countSuccess(dexer, first, playerNumbers, DIFFERENCES);
