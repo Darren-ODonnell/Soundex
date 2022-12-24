@@ -4,10 +4,7 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.language.RefinedSoundex;
 import org.apache.commons.codec.language.Soundex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
@@ -19,6 +16,10 @@ public class Main {
     public static List<String>  success = new ArrayList<>();
     public static List<String> playerNumbers = new ArrayList<>();
     public static List<String>  statNames = new ArrayList<>();
+
+    public static List<String> onePlusTwo = new ArrayList<>();
+    public static List<String> twoPlusThree = new ArrayList<>();
+    public static List<String> allThree = new ArrayList<>();
 
     public static HashMap<String , String> onePLusTwoSoundexes   = new HashMap<>();
     public static HashMap<String , String> twoPlusThreeSoundexes = new HashMap<>();
@@ -49,26 +50,42 @@ public class Main {
         Soundexer dexer = new Soundexer();
         RefinedSoundex rDex = new RefinedSoundex();
         loadTestWords();
-        int encoder = OWN_ENCODER;
+        int encoder = DIFFERENCES;
 
+        loadDictionaries();
         loadSoundexArrays(dex ,dexer, rDex, encoder);
 
-        singleWordDiffChecks();
+        int totalCount = totalCount( first, second, third, firsttwowords );
+        int found = checkTestWords(dex,dexer,rDex,encoder);
+        System.out.println("Found: "+found+ " Total: " + totalCount + " Percent: " + (float) found/totalCount * 100 + " %");
+    }
 
-//        int totalCount = totalCount(first, second, third, firsttwowords);
-//        int found = checkTestWords(dex,dexer,rDex,encoder);
-//
-//        float result = (float) found/totalCount * 100;
-//        System.out.println("Found: "+found+ " Total: " + totalCount + " Percent: " + result + " %");
+    private static HashMap<Integer, List<String>> getWordRatings(String testWord, List<String> dictionary) {
+        // input word and wordlist
+        // return hashmap of key=ratings and list of words matching that rating.
+
+        String wordDex = dexer.encode(testWord);
+        HashMap<Integer, List<String>> ratings = new HashMap<>();
+
+        for(String dWord : dictionary) {
+            String dWordDex = dexer.encode(dWord);
+            int rating = difference(wordDex, dWordDex);
+            if(ratings.containsKey(rating)) {
+                List<String> words = ratings.get(rating);
+                words.add(dWord);
+                ratings.replace(rating, words);
+            } else {
+                List<String> words = new ArrayList<>();
+                words.add(dWord);
+                ratings.put(rating,words);
+            }
+        };
+
+        return ratings;
     }
 
     private static void singleWordDiffChecks() {
         // using 'first' words and playerNumberSoundexes
-
-
-
-
-
 
         for(String word : first) {
             String wordDex = dex.encode(word);
@@ -103,7 +120,6 @@ public class Main {
         };
     }
 
-
     private static int difference(String word1, String word2) {
         char[] wordChars1 = word1.toCharArray();
         char[] wordChars2 = word2.toCharArray();
@@ -112,31 +128,10 @@ public class Main {
         // take in soundex strings of testwords and dictionary words
         // starting with a rating of 4, count down where index values are different - cap at zero.
 
-
-        for(int i = 0; i<wordChars1.length;i++) {
-            if (wordChars1[i] != wordChars2[i]) {
-                rating--;
-            }
-        }
+        for(int i = 0; i<wordChars1.length && i<wordChars2.length;i++)
+            if (wordChars1[i] != wordChars2[i]) rating--;
 
         return Math.max(rating, 0);
-    }
-
-
-
-    private static void checkFirst(String testWord, List<String> first, Soundex dex) {
-
-        HashMap<String, Integer> sounds = new HashMap<>();
-
-
-        first.forEach(word -> {
-//            sounds.put(word, dex.soundex(testWord));
-            System.out.println(word + " - " + dex.soundex(word) + " - " + dex.encode(word));
-        });
-
-//        first.forEach(word -> System.out.println(word + " - " + sounds.get(word)));
-
-
     }
 
     private static int checkTestWords(Soundex dex, Soundexer dexer, RefinedSoundex rDex, int encoder) {
@@ -146,32 +141,30 @@ public class Main {
                  f  = countSuccess(dex, first, playerNumberSoundexes);
                  f += countSuccess(dex, second, statNameSoundexes);
                  f += countSuccess(dex, third, successSoundexes);
-                 f += countSuccess(dex, firsttwowords, successSoundexes);
-                 f += countSuccess(dex, third, onePLusTwoSoundexes);
+                 f += countSuccess(dex, firsttwowords, onePLusTwoSoundexes);
+//                 f += countSuccess(dex, third, onePLusTwoSoundexes);
                  break;
              case OWN_ENCODER:
                  f  = countSuccess(dexer, first, playerNumberSoundexes);
                  f += countSuccess(dexer, second, statNameSoundexes);
                  f += countSuccess(dexer, third, successSoundexes);
-                 f += countSuccess(dexer, firsttwowords, successSoundexes);
-                 f += countSuccess(dexer, third, onePLusTwoSoundexes);
+                 f += countSuccess(dexer, firsttwowords, onePLusTwoSoundexes);
+//                 f += countSuccess(dexer, third, onePLusTwoSoundexes);
                  break;
              case REFINED_ENCODER:
                  f  = countSuccess(rDex, first, playerNumberSoundexes);
                  f += countSuccess(rDex, second, statNameSoundexes);
                  f += countSuccess(rDex, third, successSoundexes);
-                 f += countSuccess(rDex, firsttwowords, successSoundexes);
-                 f += countSuccess(rDex, third, onePLusTwoSoundexes);
+                 f += countSuccess(rDex, firsttwowords, onePLusTwoSoundexes);
+//                 f += countSuccess(rDex, third, onePLusTwoSoundexes);
                  break;
              case DIFFERENCES :
-                 f  = countSuccess(dexer, first, playerNumberSoundexes, DIFFERENCES);
-                 f += countSuccess(dexer, second, statNameSoundexes, DIFFERENCES);
-                 f += countSuccess(dexer, third, successSoundexes, DIFFERENCES);
-                 f += countSuccess(dexer, firsttwowords, successSoundexes, DIFFERENCES);
-                 f += countSuccess(dexer, third, onePLusTwoSoundexes, DIFFERENCES);
+                 f  = countSuccess(dexer, first, playerNumbers, DIFFERENCES);
+                 f += countSuccess(dexer, second, statNames, DIFFERENCES);
+                 f += countSuccess(dexer, third, success, DIFFERENCES);
+                 f += countSuccess(dexer, firsttwowords, onePlusTwo, DIFFERENCES);
+                 f += countSuccess(dexer, secondtwowords, twoPlusThree, DIFFERENCES);
                  break;
-
-
          }
         return f;
     }
@@ -190,6 +183,7 @@ public class Main {
         System.out.println();
         return f;
     }
+
     private static int countSuccess(Soundexer dex, List<String> list, HashMap<String, String> soundexes) {
         int f = 0;
         for(String word : list) {
@@ -200,28 +194,21 @@ public class Main {
         System.out.println();
         return f;
     }
-    private static int countSuccess(Soundexer dex, List<String> list, HashMap<String, String> soundexes, int type) {
+
+    private static int countSuccess(Soundexer dex, List<String> testWords, List<String> dictionary, int type) {
         int f = 0;
-        for(String word : list) {
-            int found = findByDifferences(dex, word, soundexes);
-             f+=found;
+
+        for(String word : testWords ) {
+
+            HashMap<Integer, List<String>> wordRatings = getWordRatings(word,dictionary);
+            int max = Collections.max(wordRatings.keySet());
+            List<String> words = wordRatings.get(max);
+            System.out.println(word + " -> " + words);
+            if(words.size()<3) f++;
         };
-        System.out.println();
+
         return f;
     }
-
-    private static int findByDifferences(Soundexer dex, String word, HashMap<String, String> soundexes) {
-
-        HashMap<String, Integer> ratings = new HashMap<>();
-        String wordex = dex.encode(word);
-        for(String soundexKey : soundexes.keySet()) {
-            ratings.put(soundexKey, difference(wordex, soundexKey));
-        }
-
-
-
-    }
-
 
     private static int countSuccess(RefinedSoundex dex, List<String> list, HashMap<String, String> soundexes) {
         int f = 0;
@@ -241,12 +228,9 @@ public class Main {
 
         firsttwowords  = Arrays.asList("uncatch","reebok", "oracle", "fargo", "golfer", "onecatch","oncatch");
         secondtwowords = Arrays.asList("castro", "blackpool");
-
     }
 
-
-    public static void loadSoundexArrays(Soundex dex, Soundexer dexer, RefinedSoundex rDex, int encoder ) {
-
+    public static void loadDictionaries() {
         // player numbers
         playerNumbers = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine","ten",
                 "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen","twenty",
@@ -258,32 +242,29 @@ public class Main {
                 "ScoreSideLine","SaveHurl","ScoreMiss","Solo","SoloPass","SoloScore","Standup","SubstituteOff","SubstituteOn");
 
         // success
-        success = Arrays.asList("true","false","win","loss","one","zero");
-
-        List<String> onePlusTwo = new ArrayList<>();
-        List<String> twoPlusThree = new ArrayList<>();
-        List<String> allThree = new ArrayList<>();
+        success = Arrays.asList("true","false","win","loss","one","zero","On", "Off");
 
         // combining first and second words
-        for(int i = 0; i < playerNumbers.size();i++) {
-            for (int j = 0; j < statNames.size(); j++) {
-                onePlusTwo.add(playerNumbers.get(i)+statNames.get(j));
-            }
-        }
+        for (String number : playerNumbers)
+            for (String statName : statNames)
+                onePlusTwo.add(number + statName);
+
+
         // combining 2nd two
-        for(int i = 0; i < statNames.size();i++) {
-            for (int j = 0; j < success.size(); j++) {
-                twoPlusThree.add(statNames.get(i)+success.get(j));
-            }
-        }
+        for (String statName : statNames)
+            for (String s : success)
+                twoPlusThree.add(statName + s);
+
+
         // combining all three
-        for(int i = 0; i < playerNumbers.size();i++) {
-            for (int j = 0; j < statNames.size(); j++) {
-                for (int k = 0; k < success.size(); k++) {
-                    allThree.add(playerNumbers.get(i)+statNames.get(j)+success.get(k));
-                }
-            }
-        }
+        for ( String number :  playerNumbers )
+            for ( String statName : statNames )
+                for ( String success : success )
+                    allThree.add(number + statName + success );
+
+    }
+
+    public static void loadSoundexArrays(Soundex dex, Soundexer dexer, RefinedSoundex rDex, int encoder ) {
 
         switch(encoder) {
             case APACHE_ENCODER: // apache encoder
@@ -295,6 +276,7 @@ public class Main {
                 twoPlusThree.forEach( word -> twoPlusThreeSoundexes.put( dex.encode(word), word ));
                 allThree.forEach( word     -> allThreeSoundexes.put( dex.encode(word), word ));
                 break;
+
             case OWN_ENCODER: // homemade encoder
                 playerNumbers.forEach( player ->  playerNumberSoundexes.put( dexer.encode( player ), player ) );
                 statNames.forEach( stat       ->  statNameSoundexes.put( dexer.encode( stat ), stat) );
@@ -304,6 +286,7 @@ public class Main {
                 twoPlusThree.forEach( word -> twoPlusThreeSoundexes.put( dexer.encode(word), word ));
                 allThree.forEach( word     -> allThreeSoundexes.put( dexer.encode(word), word ));
                 break;
+
             case REFINED_ENCODER: // homemade encoder
                 playerNumbers.forEach( player ->  playerNumberSoundexes.put( rDex.encode( player ), player ) );
                 statNames.forEach( stat       ->  statNameSoundexes.put( rDex.encode( stat ), stat) );
