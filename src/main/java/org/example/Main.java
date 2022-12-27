@@ -1,6 +1,5 @@
 package org.example;
 
-import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.language.RefinedSoundex;
 import org.apache.commons.codec.language.Soundex;
 
@@ -106,7 +105,7 @@ public class Main {
             String dexword = dex.encode(word);
             System.out.println(word + " -> " + soundexes.get(dexword));
             if(soundexes.get(dexword)!=null) f++;
-        };
+        }
         System.out.println();
         return f;
     }
@@ -117,7 +116,7 @@ public class Main {
             String dexword = dex.encode(word);
             System.out.println(word + " -> " + soundexes.get(dexword));
             if(soundexes.get(dexword)!=null) f++;
-        };
+        }
         System.out.println();
         return f;
     }
@@ -132,7 +131,7 @@ public class Main {
             List<String> words = wordRatings.get(max);
             System.out.println(word + " -> " + words);
             if(words.size()<3) f++;
-        };
+        }
 
         return f;
     }
@@ -143,7 +142,7 @@ public class Main {
             String dexword = dex.encode(word);
             System.out.println(word + " -> " + soundexes.get(dexword));
             if(soundexes.get(dexword)!=null) f++;
-        };
+        }
         System.out.println();
         return f;
     }
@@ -188,6 +187,7 @@ public class Main {
             for ( String statName : statNames )
                 for ( String success : success )
                     allThree.add(number + statName + success );
+
 
     }
 
