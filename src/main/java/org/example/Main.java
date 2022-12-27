@@ -35,7 +35,7 @@ public class Main {
 
     public static List<String> firsttwowords  = new ArrayList<>();
     public static List<String> secondtwowords = new ArrayList<>();
-    public static List<String> allthreewords  = new ArrayList<>();
+
 
     final static int APACHE_ENCODER = 1;
     final static int OWN_ENCODER = 2;
@@ -60,79 +60,6 @@ public class Main {
         System.out.println("Found: "+found+ " Total: " + totalCount + " Percent: " + (float) found/totalCount * 100 + " %");
     }
 
-    private static HashMap<Integer, List<String>> getWordRatings(String testWord, List<String> dictionary) {
-        // input word and wordlist
-        // return hashmap of key=ratings and list of words matching that rating.
-
-        String wordDex = dexer.encode(testWord);
-        HashMap<Integer, List<String>> ratings = new HashMap<>();
-
-        for(String dWord : dictionary) {
-            String dWordDex = dexer.encode(dWord);
-            int rating = difference(wordDex, dWordDex);
-            if(ratings.containsKey(rating)) {
-                List<String> words = ratings.get(rating);
-                words.add(dWord);
-                ratings.replace(rating, words);
-            } else {
-                List<String> words = new ArrayList<>();
-                words.add(dWord);
-                ratings.put(rating,words);
-            }
-        };
-
-        return ratings;
-    }
-
-    private static void singleWordDiffChecks() {
-        // using 'first' words and playerNumberSoundexes
-
-        for(String word : first) {
-            String wordDex = dex.encode(word);
-            String wordDexer = dexer.encode(word);
-            String wordRdex = rDex.encode(word);
-
-            for(String wordToMatch : playerNumbers) {
-                String wordToMatchDex = dex.encode(wordToMatch);
-                String wordToMatchDexer = dexer.encode(wordToMatch);
-                String wordToMatchRdex = rDex.encode(wordToMatch);
-                int rating = difference(wordDexer,wordToMatchDexer );
-
-                try {
-                    // create array of output parameters
-                    // then using string.join to add a separator between each
-                    String[] array = new String[]{
-                            word,
-                            "Dex "+wordToMatch+"->"+wordDex+"->"+wordToMatchDex,
-                            "" + dex.difference(wordDex, wordToMatchDex),
-                            "Dexer "+wordToMatch+"->"+wordDexer+"->"+wordToMatchDexer,
-                            "" + dex.difference(wordDexer, wordToMatchDexer),
-                            "rDex "+wordToMatch+"->"+wordRdex+"->"+wordToMatchRdex,
-                            "" + dex.difference(wordRdex, wordToMatchRdex),
-                            "diff "+wordToMatch+"->"+wordDexer+"->"+wordToMatchDexer,
-                            "" + difference(wordDexer, wordToMatchDexer),
-                    };
-                    System.out.println(String.join(" - ", array));
-                } catch (EncoderException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
-    }
-
-    private static int difference(String word1, String word2) {
-        char[] wordChars1 = word1.toCharArray();
-        char[] wordChars2 = word2.toCharArray();
-        int rating = 4;
-
-        // take in soundex strings of testwords and dictionary words
-        // starting with a rating of 4, count down where index values are different - cap at zero.
-
-        for(int i = 0; i<wordChars1.length && i<wordChars2.length;i++)
-            if (wordChars1[i] != wordChars2[i]) rating--;
-
-        return Math.max(rating, 0);
-    }
 
     private static int checkTestWords(Soundex dex, Soundexer dexer, RefinedSoundex rDex, int encoder) {
          int f = 0;
@@ -200,7 +127,7 @@ public class Main {
 
         for(String word : testWords ) {
 
-            HashMap<Integer, List<String>> wordRatings = getWordRatings(word,dictionary);
+            HashMap<Integer, List<String>> wordRatings = dexer.getWordRatings(word,dictionary);
             int max = Collections.max(wordRatings.keySet());
             List<String> words = wordRatings.get(max);
             System.out.println(word + " -> " + words);
@@ -242,7 +169,7 @@ public class Main {
                 "ScoreSideLine","SaveHurl","ScoreMiss","Solo","SoloPass","SoloScore","Standup","SubstituteOff","SubstituteOn");
 
         // success
-        success = Arrays.asList("true","false","win","loss","one","zero","On", "Off");
+        success = Arrays.asList("true","false","win","loss","one","zero","On", "Off", "Won", "Lost");
 
         // combining first and second words
         for (String number : playerNumbers)
